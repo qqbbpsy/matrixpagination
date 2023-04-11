@@ -1,4 +1,4 @@
-  var pagination = document.querySelector(".pagination");
+var pagination = document.querySelector(".pagination");
 
 // Generate the initial pagination buttons
 updatePagination();
