@@ -1,16 +1,14 @@
-var pagination = document.querySelector(".pagination");
+  var pagination = document.querySelector(".pagination");
 
 // Generate the initial pagination buttons
 updatePagination();
-
-// Update the pagination buttons every 10 seconds
-setInterval(updatePagination, 10000);
 
 function updatePagination() {
   var gallery = document.querySelector(".gallery");
   var totalImages = parseInt(gallery.getAttribute("data-total-images"));
   var imagesPerPage = 15;
   var totalPages = Math.ceil(totalImages / imagesPerPage);
+  var currentPage = 1;
 
   // Remove any existing pagination buttons
   while (pagination.firstChild) {
@@ -18,11 +16,52 @@ function updatePagination() {
   }
 
   // Generate new pagination buttons based on the total number of pages
-  for (var i = 1; i <= totalPages; i++) {
+  if (totalPages > 1) {
     var button = document.createElement("button");
-    button.innerHTML = i;
+    button.innerHTML = "«";
     button.addEventListener("click", function() {
-      showPage(parseInt(this.innerHTML), imagesPerPage);
+      if (currentPage > 1) {
+        currentPage--;
+        showPage(currentPage, imagesPerPage);
+      }
+    });
+    pagination.appendChild(button);
+
+    for (var i = 1; i <= totalPages; i++) {
+      var button = document.createElement("button");
+      button.innerHTML = i;
+      button.addEventListener("click", function() {
+        currentPage = parseInt(this.innerHTML);
+        showPage(currentPage, imagesPerPage);
+      });
+      pagination.appendChild(button);
+      if (i === 5) {
+        break;
+      }
+    }
+
+    if (totalPages > 5) {
+      var button = document.createElement("button");
+      button.innerHTML = "...";
+      button.disabled = true;
+      pagination.appendChild(button);
+
+      var button = document.createElement("button");
+      button.innerHTML = totalPages;
+      button.addEventListener("click", function() {
+        currentPage = parseInt(this.innerHTML);
+        showPage(currentPage, imagesPerPage);
+      });
+      pagination.appendChild(button);
+    }
+
+    var button = document.createElement("button");
+    button.innerHTML = "»";
+    button.addEventListener("click", function() {
+      if (currentPage < totalPages) {
+        currentPage++;
+        showPage(currentPage, imagesPerPage);
+      }
     });
     pagination.appendChild(button);
   }
@@ -48,6 +87,18 @@ function showPage(page, imagesPerPage) {
   }
 
   lazyLoad.update(); // re-scan the page for new images to load
+
+  // Remove the active class from all pagination buttons
+  var paginationButtons = document.querySelectorAll('.pagination button');
+  paginationButtons.forEach(function(button) {
+    button.classList.remove('active');
+  });
+
+  // Add the active class to the current page button
+  var currentPageButton = document.querySelector('.pagination button:nth-child(' + (page + 1) + ')');
+  if (currentPageButton) {
+    currentPageButton.classList.add('active');
+  }
 }
 
 var lazyLoad = new LazyLoad({
